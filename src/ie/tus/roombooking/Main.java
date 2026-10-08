@@ -1,16 +1,26 @@
 package ie.tus.roombooking;
 
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Room Booking System");
-        Room room = new Room("J1007", 30);
-        System.out.println("Example room: " + room.getRoomName());
-        System.out.println("Capacity: " + room.getCapacity());
-
+        Scanner scanner = new Scanner(System.in);
         UserService userService = new UserService();
-        User valid = userService.login("student1", "pass123");
-        System.out.println("Valid login test: " + (valid != null));
-        User invalid = userService.login("student1", "wrong");
-        System.out.println("Invalid login test: " + (invalid != null));
+
+        System.out.println("Room Booking System");
+        System.out.println("=== Login ===");
+        System.out.print("Username: ");
+        String username = scanner.nextLine();
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
+
+        User user = userService.login(username, password);
+        if (user != null) {
+            System.out.println("Login successful. Welcome, " + user.getUsername() + "!");
+        } else {
+            System.out.println("Login failed.");
+        }
+
+        scanner.close();
     }
 }
