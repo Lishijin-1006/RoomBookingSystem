@@ -6,5 +6,7 @@ public class Main {
         Room room = new Room("J1007", 30);
         System.out.println("Example room: " + room.getRoomName());
         System.out.println("Capacity: " + room.getCapacity());
+        User user = new User("student1", "pass123");
+        System.out.println("Test user: " + user.getUsername());
     }
 }
