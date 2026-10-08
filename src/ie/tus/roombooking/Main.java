@@ -8,19 +8,24 @@ public class Main {
         UserService userService = new UserService();
 
         System.out.println("Room Booking System");
-        System.out.println("=== Login ===");
-        System.out.print("Username: ");
-        String username = scanner.nextLine();
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
 
-        User user = userService.login(username, password);
-        if (user != null) {
-            System.out.println("Login successful. Welcome, " + user.getUsername() + "!");
-            showMainMenu(scanner);
-        } else {
-            System.out.println("Login failed.");
+        User user = null;
+        while (user == null) {
+            System.out.println("=== Login ===");
+            System.out.print("Username: ");
+            String username = scanner.nextLine();
+            System.out.print("Password: ");
+            String password = scanner.nextLine();
+
+            user = userService.login(username, password);
+            if (user == null) {
+                System.out.println("Error: invalid username or password. Please try again.");
+                System.out.println();
+            }
         }
+
+        System.out.println("Login successful. Welcome, " + user.getUsername() + "!");
+        showMainMenu(scanner);
 
         scanner.close();
     }
