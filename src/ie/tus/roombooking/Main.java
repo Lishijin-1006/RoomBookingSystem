@@ -1,5 +1,7 @@
 package ie.tus.roombooking;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -56,19 +58,58 @@ public class Main {
 
     private static void searchRooms(Scanner scanner, RoomService roomService) {
         System.out.println("=== Search Rooms ===");
-        System.out.print("Date (e.g. 2026-10-23): ");
-        String date = scanner.nextLine();
-        System.out.print("Start hour (0-23): ");
-        int start = Integer.parseInt(scanner.nextLine());
-        System.out.print("End hour (1-24): ");
-        int end = Integer.parseInt(scanner.nextLine());
+        String date = readDate(scanner);
+
+        int start;
+        int end;
+        while (true) {
+            start = readHour(scanner, "Start hour (0-23): ", 0, 23);
+            end = readHour(scanner, "End hour (1-24): ", 1, 24);
+            if (end > start) {
+                break;
+            }
+            System.out.println("Error: end hour must be after start hour. Please try again.");
+        }
 
         TimeSlot requested = new TimeSlot(date, start, end);
         List<Room> results = roomService.searchAvailableRooms(requested);
 
-        System.out.println("Available rooms for " + requested + ":");
-        for (Room room : results) {
-            System.out.println("- " + room.getRoomName() + " (capacity " + room.getCapacity() + ")");
+        if (results.isEmpty()) {
+            System.out.println("No rooms available for this time.");
+        } else {
+            System.out.println("Available rooms for " + requested + ":");
+            for (Room room : results) {
+                System.out.println("- " + room.getRoomName() + " (capacity " + room.getCapacity() + ")");
+            }
+        }
+    }
+
+    private static String readDate(Scanner scanner) {
+        while (true) {
+            System.out.print("Date (e.g. 2026-10-23): ");
+            String input = scanner.nextLine().trim();
+            try {
+                LocalDate.parse(input);
+                return input;
+            } catch (DateTimeParseException e) {
+                System.out.println("Error: please enter the date as YYYY-MM-DD.");
+            }
+        }
+    }
+
+    private static int readHour(Scanner scanner, String prompt, int min, int max) {
+        while (true) {
+            System.out.print(prompt);
+            String input = scanner.nextLine().trim();
+            try {
+                int hour = Integer.parseInt(input);
+                if (hour >= min && hour <= max) {
+                    return hour;
+                }
+            } catch (NumberFormatException e) {
+                // not a number, fall through to the error message
+            }
+            System.out.println("Error: please enter a whole number from " + min + " to " + max + ".");
         }
     }
 }
