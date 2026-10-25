@@ -14,6 +14,7 @@ public class RoomService {
         // sample existing bookings
         j1007.addBookedSlot(new TimeSlot("2026-10-23", 9, 11));
         j1010.addBookedSlot(new TimeSlot("2026-10-23", 10, 12));
+        library1.addBookedSlot(new TimeSlot("2026-10-23", 9, 11));
 
         rooms.add(j1007);
         rooms.add(j1010);
