@@ -10,6 +10,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         UserService userService = new UserService();
         RoomService roomService = new RoomService();
+        BookingService bookingService = new BookingService();
 
         System.out.println("Room Booking System");
 
@@ -29,25 +30,32 @@ public class Main {
         }
 
         System.out.println("Login successful. Welcome, " + user.getUsername() + "!");
-        showMainMenu(scanner, roomService);
+        showMainMenu(scanner, user, roomService, bookingService);
 
         scanner.close();
     }
 
-    private static void showMainMenu(Scanner scanner, RoomService roomService) {
+    private static void showMainMenu(Scanner scanner, User user,
+            RoomService roomService, BookingService bookingService) {
         boolean running = true;
 
         while (running) {
             System.out.println();
             System.out.println("=== Main Menu ===");
             System.out.println("1. Search available rooms");
-            System.out.println("2. Exit");
+            System.out.println("2. Book a room");
+            System.out.println("3. View my bookings");
+            System.out.println("4. Exit");
             System.out.print("Choose an option: ");
             String choice = scanner.nextLine();
 
             if (choice.equals("1")) {
                 searchRooms(scanner, roomService);
             } else if (choice.equals("2")) {
+                bookRoom(scanner, user, roomService, bookingService);
+            } else if (choice.equals("3")) {
+                viewMyBookings(user, bookingService);
+            } else if (choice.equals("4")) {
                 System.out.println("Goodbye!");
                 running = false;
             } else {
@@ -58,20 +66,7 @@ public class Main {
 
     private static void searchRooms(Scanner scanner, RoomService roomService) {
         System.out.println("=== Search Rooms ===");
-        String date = readDate(scanner);
-
-        int start;
-        int end;
-        while (true) {
-            start = readHour(scanner, "Start hour (0-23): ", 0, 23);
-            end = readHour(scanner, "End hour (1-24): ", 1, 24);
-            if (end > start) {
-                break;
-            }
-            System.out.println("Error: end hour must be after start hour. Please try again.");
-        }
-
-        TimeSlot requested = new TimeSlot(date, start, end);
+        TimeSlot requested = readTimeSlot(scanner);
         List<Room> results = roomService.searchAvailableRooms(requested);
 
         if (results.isEmpty()) {
@@ -81,6 +76,53 @@ public class Main {
             for (Room room : results) {
                 System.out.println("- " + room.getRoomName() + " (capacity " + room.getCapacity() + ")");
             }
+        }
+    }
+
+    private static void bookRoom(Scanner scanner, User user,
+            RoomService roomService, BookingService bookingService) {
+        System.out.println("=== Book a Room ===");
+        TimeSlot slot = readTimeSlot(scanner);
+        List<Room> results = roomService.searchAvailableRooms(slot);
+
+        if (results.isEmpty()) {
+            System.out.println("No rooms available for this time.");
+            return;
+        }
+
+        System.out.println("Available rooms for " + slot + ":");
+        for (int i = 0; i < results.size(); i++) {
+            Room room = results.get(i);
+            System.out.println((i + 1) + ". " + room.getRoomName() + " (capacity " + room.getCapacity() + ")");
+        }
+
+        int choice = readNumber(scanner, "Choose a room number: ", 1, results.size());
+        Booking booking = bookingService.createBooking(user, results.get(choice - 1), slot);
+        System.out.println("Booking confirmed: " + booking);
+    }
+
+    private static void viewMyBookings(User user, BookingService bookingService) {
+        System.out.println("=== My Bookings ===");
+        List<Booking> myBookings = bookingService.getBookingsFor(user);
+
+        if (myBookings.isEmpty()) {
+            System.out.println("You have no bookings.");
+        } else {
+            for (Booking booking : myBookings) {
+                System.out.println("- " + booking);
+            }
+        }
+    }
+
+    private static TimeSlot readTimeSlot(Scanner scanner) {
+        String date = readDate(scanner);
+        while (true) {
+            int start = readNumber(scanner, "Start hour (0-23): ", 0, 23);
+            int end = readNumber(scanner, "End hour (1-24): ", 1, 24);
+            if (end > start) {
+                return new TimeSlot(date, start, end);
+            }
+            System.out.println("Error: end hour must be after start hour. Please try again.");
         }
     }
 
@@ -97,14 +139,14 @@ public class Main {
         }
     }
 
-    private static int readHour(Scanner scanner, String prompt, int min, int max) {
+    private static int readNumber(Scanner scanner, String prompt, int min, int max) {
         while (true) {
             System.out.print(prompt);
             String input = scanner.nextLine().trim();
             try {
-                int hour = Integer.parseInt(input);
-                if (hour >= min && hour <= max) {
-                    return hour;
+                int number = Integer.parseInt(input);
+                if (number >= min && number <= max) {
+                    return number;
                 }
             } catch (NumberFormatException e) {
                 // not a number, fall through to the error message
