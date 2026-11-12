@@ -8,6 +8,9 @@ public class BookingService {
     private int nextId = 1;
 
     public Booking createBooking(User user, Room room, TimeSlot slot) {
+        if (!room.isAvailable(slot)) {
+            throw new IllegalStateException("Room " + room.getRoomName() + " is already booked for this time.");
+        }
         if (!slot.isValid()) {
             throw new IllegalArgumentException("End time must be after start time.");
         }
