@@ -44,7 +44,7 @@ public class Main {
             System.out.println("=== Main Menu ===");
             System.out.println("1. Search available rooms");
             System.out.println("2. Book a room");
-            System.out.println("3. View my bookings");
+            System.out.println("3. View my booking history");
             System.out.println("4. Cancel a booking");
             System.out.println("5. Exit");
             System.out.print("Choose an option: ");
@@ -105,11 +105,11 @@ public class Main {
     }
 
     private static void viewMyBookings(User user, BookingService bookingService) {
-        System.out.println("=== My Bookings ===");
+        System.out.println("=== My Booking History ===");
         List<Booking> myBookings = bookingService.getBookingsFor(user);
 
         if (myBookings.isEmpty()) {
-            System.out.println("You have no bookings.");
+            System.out.println("No bookings yet.");
         } else {
             for (Booking booking : myBookings) {
                 System.out.println("- " + booking);
