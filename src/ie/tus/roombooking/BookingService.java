@@ -20,6 +20,18 @@ public class BookingService {
         room.addBookedSlot(slot);
         return booking;
     }
+    
+    public boolean cancelBooking(User user, int bookingId) {
+        for (Booking booking : bookings) {
+            if (booking.getId() == bookingId
+                    && booking.getUser().getUsername().equals(user.getUsername())) {
+                bookings.remove(booking);
+                booking.getRoom().removeBookedSlot(booking.getSlot());
+                return true;
+            }
+        }
+        return false;
+    }
 
     public List<Booking> getBookingsFor(User user) {
         List<Booking> result = new ArrayList<>();

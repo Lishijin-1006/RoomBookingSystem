@@ -129,4 +129,52 @@ public class BookingServiceTest {
 
         assertEquals(2, service.getBookingsFor(user).size());
     }
+    
+    // LSJABC-12 Cancel a booking
+
+    @Test
+    void cancelledBookingIsRemovedFromMyBookings() {
+        BookingService service = new BookingService();
+        User user = new User("student1", "pass123");
+        Booking booking = service.createBooking(user, new Room("J1007", 30), new TimeSlot("2026-11-10", 9, 11));
+
+        boolean cancelled = service.cancelBooking(user, booking.getId());
+
+        assertTrue(cancelled);
+        assertEquals(0, service.getBookingsFor(user).size());
+    }
+
+    @Test
+    void cancelledRoomIsAvailableAgain() {
+        BookingService service = new BookingService();
+        User user = new User("student1", "pass123");
+        Room room = new Room("J1007", 30);
+        TimeSlot slot = new TimeSlot("2026-11-10", 9, 11);
+        Booking booking = service.createBooking(user, room, slot);
+
+        service.cancelBooking(user, booking.getId());
+
+        assertTrue(room.isAvailable(slot));
+    }
+
+    @Test
+    void cannotCancelSomeoneElsesBooking() {
+        BookingService service = new BookingService();
+        User student1 = new User("student1", "pass123");
+        User student2 = new User("student2", "hello456");
+        Booking booking = service.createBooking(student1, new Room("J1007", 30), new TimeSlot("2026-11-10", 9, 11));
+
+        boolean cancelled = service.cancelBooking(student2, booking.getId());
+
+        assertFalse(cancelled);
+        assertEquals(1, service.getBookingsFor(student1).size());
+    }
+
+    @Test
+    void cancellingUnknownBookingReturnsFalse() {
+        BookingService service = new BookingService();
+        User user = new User("student1", "pass123");
+
+        assertFalse(service.cancelBooking(user, 99));
+    }
 }

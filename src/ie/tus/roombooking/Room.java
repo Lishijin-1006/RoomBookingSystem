@@ -24,6 +24,10 @@ public class Room {
     public void addBookedSlot(TimeSlot slot) {
         bookedSlots.add(slot);
     }
+    
+    public void removeBookedSlot(TimeSlot slot) {
+        bookedSlots.remove(slot);
+    }
 
     public boolean isAvailable(TimeSlot requested) {
         for (TimeSlot booked : bookedSlots) {
