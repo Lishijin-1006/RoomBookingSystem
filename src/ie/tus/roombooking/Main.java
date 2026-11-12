@@ -45,7 +45,8 @@ public class Main {
             System.out.println("1. Search available rooms");
             System.out.println("2. Book a room");
             System.out.println("3. View my bookings");
-            System.out.println("4. Exit");
+            System.out.println("4. Cancel a booking");
+            System.out.println("5. Exit");
             System.out.print("Choose an option: ");
             String choice = scanner.nextLine();
 
@@ -56,6 +57,8 @@ public class Main {
             } else if (choice.equals("3")) {
                 viewMyBookings(user, bookingService);
             } else if (choice.equals("4")) {
+                cancelBooking(scanner, user, bookingService);
+            } else if (choice.equals("5")) {
                 System.out.println("Goodbye!");
                 running = false;
             } else {
@@ -112,6 +115,25 @@ public class Main {
                 System.out.println("- " + booking);
             }
         }
+    }
+    
+    private static void cancelBooking(Scanner scanner, User user, BookingService bookingService) {
+        System.out.println("=== Cancel a Booking ===");
+        List<Booking> myBookings = bookingService.getBookingsFor(user);
+
+        if (myBookings.isEmpty()) {
+            System.out.println("You have no bookings to cancel.");
+            return;
+        }
+
+        for (int i = 0; i < myBookings.size(); i++) {
+            System.out.println((i + 1) + ". " + myBookings.get(i));
+        }
+
+        int choice = readNumber(scanner, "Choose a booking to cancel: ", 1, myBookings.size());
+        Booking selected = myBookings.get(choice - 1);
+        bookingService.cancelBooking(user, selected.getId());
+        System.out.println("Booking #" + selected.getId() + " cancelled.");
     }
 
     private static TimeSlot readTimeSlot(Scanner scanner) {
