@@ -29,6 +29,10 @@ public class TimeSlot {
         }
         return startHour < other.endHour && other.startHour < endHour;
     }
+    
+    public boolean isValid() {
+        return startHour >= 0 && endHour <= 24 && endHour > startHour;
+    }
 
     @Override
     public String toString() {

@@ -33,4 +33,11 @@ public class TimeSlotTest {
         TimeSlot b = new TimeSlot("2026-10-23", 10, 11);
         assertTrue(a.overlaps(b));
     }
+    
+    @Test
+    void validAndInvalidSlots() {
+        assertTrue(new TimeSlot("2026-11-10", 9, 11).isValid());
+        assertFalse(new TimeSlot("2026-11-10", 11, 9).isValid());
+        assertFalse(new TimeSlot("2026-11-10", 9, 9).isValid());
+    }
 }

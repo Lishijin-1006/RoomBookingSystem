@@ -59,4 +59,25 @@ public class BookingServiceTest {
         assertEquals(1, service.getBookingsFor(student1).size());
         assertEquals(0, service.getBookingsFor(student2).size());
     }
+    
+    @Test
+    void bookingWithEndBeforeStartIsRejected() {
+        BookingService service = new BookingService();
+        User user = new User("student1", "pass123");
+        Room room = new Room("J1007", 30);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.createBooking(user, room, new TimeSlot("2026-11-10", 11, 9)));
+        assertEquals(0, service.getBookingsFor(user).size());
+    }
+
+    @Test
+    void bookingWithSameStartAndEndIsRejected() {
+        BookingService service = new BookingService();
+        User user = new User("student1", "pass123");
+        Room room = new Room("J1007", 30);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.createBooking(user, room, new TimeSlot("2026-11-10", 9, 9)));
+    }
 }

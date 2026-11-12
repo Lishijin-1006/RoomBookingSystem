@@ -8,6 +8,9 @@ public class BookingService {
     private int nextId = 1;
 
     public Booking createBooking(User user, Room room, TimeSlot slot) {
+        if (!slot.isValid()) {
+            throw new IllegalArgumentException("End time must be after start time.");
+        }
         Booking booking = new Booking(nextId, user, room, slot);
         nextId++;
         bookings.add(booking);
