@@ -177,4 +177,30 @@ public class BookingServiceTest {
 
         assertFalse(service.cancelBooking(user, 99));
     }
+    
+    // LSJABC-13 View booking history
+
+    @Test
+    void bookingHistoryIsSortedByDateAndTime() {
+        BookingService service = new BookingService();
+        User user = new User("student1", "pass123");
+
+        service.createBooking(user, new Room("J1007", 30), new TimeSlot("2026-11-12", 9, 10));
+        service.createBooking(user, new Room("J1010", 12), new TimeSlot("2026-11-10", 14, 15));
+        service.createBooking(user, new Room("Library Study Room 1", 6), new TimeSlot("2026-11-10", 9, 10));
+
+        List<Booking> history = service.getBookingsFor(user);
+
+        assertEquals("Library Study Room 1", history.get(0).getRoom().getRoomName());
+        assertEquals("J1010", history.get(1).getRoom().getRoomName());
+        assertEquals("J1007", history.get(2).getRoom().getRoomName());
+    }
+
+    @Test
+    void bookingHistoryIsEmptyWhenNoBookings() {
+        BookingService service = new BookingService();
+        User user = new User("student1", "pass123");
+
+        assertTrue(service.getBookingsFor(user).isEmpty());
+    }
 }

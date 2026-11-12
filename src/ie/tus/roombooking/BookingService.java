@@ -1,5 +1,6 @@
 package ie.tus.roombooking;
 
+import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +41,8 @@ public class BookingService {
                 result.add(booking);
             }
         }
+        result.sort(Comparator.comparing((Booking b) -> b.getSlot().getDate())
+                .thenComparingInt(b -> b.getSlot().getStartHour()));
         return result;
     }
 }
